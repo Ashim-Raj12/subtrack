@@ -1,0 +1,184 @@
+:root {
+  /* Digital Curator Color Tokens */
+  --color-background: #131313;
+  --color-on-background: #e5e2e1;
+  --color-primary: #ffb1c4;
+  --color-primary-container: #ff4d8d;
+  --color-on-primary-container: #5b0028;
+  --color-surface: #131313;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container: #201f1f;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353534;
+  --color-surface-bright: #3a3939;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #e1bec5;
+  --color-outline: #a8898f;
+  --color-outline-variant: #594046;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Glassmorphism helpers */
+.glass-card {
+  background: rgba(53, 53, 52, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(89, 64, 70, 0.1);
+  border-radius: 1rem; /* 2xl */
+}
+
+.channel-pulse {
+  position: relative;
+}
+.channel-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--color-primary-container) 0%, transparent 70%);
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Layout Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+.grid { display: grid; }
+
+.text-transparent { color: transparent; }
+.bg-clip-text { background-clip: text; -webkit-background-clip: text; }
+
+/* Custom layout classes substituting tailwind classes since we are using Vanilla CSS */
+.sidebar {
+  width: 16rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 50;
+  background-color: #09090b; /* zinc-950 */
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+}
+
+.bottom-nav {
+  display: none;
+}
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(9, 9, 11, 0.8);
+    backdrop-filter: blur(12px);
+    height: 4rem;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 50;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+}
+
+.top-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 40;
+  background: rgba(9, 9, 11, 0.6);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 4rem;
+}
+@media (min-width: 768px) {
+  .top-header { padding-left: 17.5rem; } /* 16rem + 1.5 */
+}
+
+.main-content {
+  padding-top: 4rem;
+  min-height: 100vh;
+}
+@media (min-width: 768px) {
+  .main-content { padding-left: 16rem; }
+}
+.content-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Button & Nav link base */
+.nav-link {
+  color: #71717a; /* zinc-500 */
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: #e4e4e7;
+  background: rgba(39, 39, 42, 0.4);
+}
+.nav-link.active {
+  color: white;
+  background: linear-gradient(to right, rgba(236, 72, 153, 0.2), transparent);
+  border-right: 2px solid #ec4899;
+}
+
+/* Base interactive elements */
+button, input {
+  font-family: inherit;
+}
+
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
