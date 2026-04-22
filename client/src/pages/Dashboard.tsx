@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Play, CheckCircle, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,7 +29,6 @@ export default function Dashboard() {
   const handleSync = async () => {
     try {
       setIsSyncing(true);
-      const token = localStorage.getItem('subtrack_token');
       const ytToken = localStorage.getItem('youtube_access_token');
       
       if (!ytToken) {

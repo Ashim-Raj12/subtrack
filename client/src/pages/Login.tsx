@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogIn, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGoogleLogin } from '@react-oauth/google';
