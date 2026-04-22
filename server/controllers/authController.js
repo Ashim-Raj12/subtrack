@@ -20,12 +20,18 @@ export const googleAuth = async (req, res) => {
 
     // Call database to find or create the user
     let user = await User.findOne({ googleId });
-    if (!user) {
+    if (user) {
+      user.name = name;
+      user.avatar = avatar;
+      user.youtubeAccessToken = youtubeAccessToken;
+      await user.save();
+    } else {
       user = new User({
         googleId,
         name,
         email,
-        avatar
+        avatar,
+        youtubeAccessToken
       });
       await user.save();
     }
@@ -41,5 +47,23 @@ export const googleAuth = async (req, res) => {
   } catch (err) {
     console.error('Google Auth Error:', err);
     res.status(500).json({ message: 'Authentication failed' });
+  }
+};
+
+export const updateSettings = async (req, res) => {
+  try {
+    const { notificationTime, notificationsEnabled } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (notificationTime !== undefined) user.settings.notificationTime = notificationTime;
+    if (notificationsEnabled !== undefined) user.settings.notificationsEnabled = notificationsEnabled;
+
+    await user.save();
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Update Settings Error:', err);
+    res.status(500).json({ message: 'Failed to update settings' });
   }
 };

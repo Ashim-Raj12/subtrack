@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function TopNav() {
-  const { user } = useAuth();
+  const { user, searchQuery, setSearchQuery } = useAuth();
 
   return (
     <header className="top-header">
@@ -13,6 +13,8 @@ export default function TopNav() {
           <input 
             type="text" 
             placeholder="Search curated feed..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             style={{ 
               backgroundColor: 'var(--color-surface-container-lowest)', 
               border: 'none', 

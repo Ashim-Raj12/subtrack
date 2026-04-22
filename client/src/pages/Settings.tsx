@@ -1,12 +1,45 @@
-import { useState } from 'react';
-import { Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 export default function Settings() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [notificationTime, setNotificationTime] = useState('14:00');
+  const { user, login } = useAuth();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(user?.settings?.notificationsEnabled ?? true);
+  const [notificationTime, setNotificationTime] = useState(user?.settings?.notificationTime ?? '14:00');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  const { user } = useAuth();
+  useEffect(() => {
+    if (user?.settings) {
+      setNotificationsEnabled(user.settings.notificationsEnabled);
+      setNotificationTime(user.settings.notificationTime);
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      setMessage({ type: '', text: '' });
+      const token = localStorage.getItem('subtrack_token');
+      
+      const response = await axios.put('/api/auth/settings', {
+        notificationsEnabled,
+        notificationTime
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Update global user state
+      login(response.data);
+      setMessage({ type: 'success', text: 'Preferences saved successfully!' });
+    } catch (err) {
+      console.error('Error saving settings', err);
+      setMessage({ type: 'error', text: 'Failed to save preferences. Please try again.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div style={{ maxWidth: '40rem' }}>
@@ -14,6 +47,21 @@ export default function Settings() {
         <h2 style={{ fontSize: '2.25rem', fontWeight: 900, marginTop: '0.25rem', marginBottom: '0.25rem' }}>Preferences</h2>
         <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '0.875rem' }}>Configure how SubTrack curates your life.</p>
       </header>
+
+      {message.text && (
+        <div style={{ 
+          padding: '1rem', 
+          borderRadius: '0.75rem', 
+          marginBottom: '2rem',
+          backgroundColor: message.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          color: message.type === 'success' ? '#4ade80' : '#f87171',
+          border: `1px solid ${message.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+          fontSize: '0.875rem',
+          fontWeight: 500
+        }}>
+          {message.text}
+        </div>
+      )}
 
       <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: '0.5rem' }}>Profile Information</h3>
@@ -39,7 +87,7 @@ export default function Settings() {
               <div style={{ fontSize: '0.875rem', color: 'var(--color-on-surface-variant)' }}>Receive daily pushes when new videos are found.</div>
             </div>
             <label style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
-              <input type="checkbox" checked={notificationsEnabled} onChange={e => setNotificationsEnabled(e.target.checked)} style={{ srOnly: true, width: 0, height: 0, opacity: 0 }} />
+              <input type="checkbox" checked={notificationsEnabled} onChange={e => setNotificationsEnabled(e.target.checked)} style={{ width: 0, height: 0, opacity: 0 }} />
               <div style={{ 
                 width: '3rem', height: '1.5rem', 
                 backgroundColor: notificationsEnabled ? 'var(--color-primary-container)' : 'var(--color-surface-container-highest)', 
@@ -81,15 +129,20 @@ export default function Settings() {
         <div style={{ height: '1px', backgroundColor: 'var(--color-outline-variant)', opacity: 0.2 }}></div>
 
         <div>
-          <button style={{ 
-            display: 'flex', alignItems: 'center', gap: '0.5rem', 
-            backgroundColor: 'var(--color-primary-container)', 
-            color: 'white', border: 'none', padding: '0.75rem 1.5rem', 
-            borderRadius: '0.75rem', fontWeight: 600, cursor: 'pointer',
-            boxShadow: 'rgba(255, 77, 141, 0.2) 0px 10px 15px -3px'
-          }}>
-            <Save size={18} />
-            Save Preferences
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '0.5rem', 
+              backgroundColor: isSaving ? 'var(--color-surface-container-highest)' : 'var(--color-primary-container)', 
+              color: 'white', border: 'none', padding: '0.75rem 1.5rem', 
+              borderRadius: '0.75rem', fontWeight: 600, cursor: isSaving ? 'not-allowed' : 'pointer',
+              boxShadow: 'rgba(255, 77, 141, 0.2) 0px 10px 15px -3px',
+              transition: 'all 0.2s'
+            }}
+          >
+            {isSaving ? <Loader2 size={18} className="spin-animation" /> : <Save size={18} />}
+            {isSaving ? 'Saving...' : 'Save Preferences'}
           </button>
         </div>
       </div>

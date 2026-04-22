@@ -5,7 +5,7 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, searchQuery } = useAuth();
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -55,6 +55,11 @@ export default function Dashboard() {
     }
   };
 
+  const filteredVideos = videos.filter(video => 
+    video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    video.channelTitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div>
       <header style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
@@ -62,7 +67,7 @@ export default function Dashboard() {
           <span style={{ color: 'var(--color-primary)', fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase', fontSize: '10px' }}>Overview</span>
           <h2 style={{ fontSize: '2.25rem', fontWeight: 900, marginTop: '0.25rem', marginBottom: '0.25rem' }}>Good Afternoon, {user?.name?.split(' ')[0]}</h2>
           <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '0.875rem' }}>
-            You have {videos.length} new curated updates.
+            You have {filteredVideos.length} matching curated updates.
           </p>
         </div>
         
@@ -83,7 +88,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
             Today's New Videos
-            {videos.length > 0 && <span style={{ backgroundColor: 'rgba(255, 77, 141, 0.1)', color: 'var(--color-primary)', fontSize: '10px', padding: '2px 8px', borderRadius: '9999px' }}>{videos.length} NEW</span>}
+            {filteredVideos.length > 0 && <span style={{ backgroundColor: 'rgba(255, 77, 141, 0.1)', color: 'var(--color-primary)', fontSize: '10px', padding: '2px 8px', borderRadius: '9999px' }}>{filteredVideos.length} FOUND</span>}
           </h3>
           
           <button 
@@ -104,13 +109,13 @@ export default function Dashboard() {
 
         {loading ? (
           <div style={{ color: 'var(--color-on-surface-variant)', textAlign: 'center', padding: '3rem' }}>Curating your feed...</div>
-        ) : videos.length === 0 ? (
+        ) : filteredVideos.length === 0 ? (
           <div style={{ color: 'var(--color-on-surface-variant)', textAlign: 'center', padding: '3rem', backgroundColor: 'var(--color-surface-container-high)', borderRadius: '1rem' }}>
-            No new videos recently. (Try syncing your subscriptions!)
+            {searchQuery ? `No videos match "${searchQuery}"` : "No new videos recently. (Try syncing your subscriptions!)"}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
-            {videos.map(video => (
+            {filteredVideos.map(video => (
               <div key={video._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer' }}>
                 <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden' }}>
                   <img src={video.thumbnailUrl} alt={video.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

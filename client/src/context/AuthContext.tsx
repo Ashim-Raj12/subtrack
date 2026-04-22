@@ -4,6 +4,10 @@ interface User {
   name: string;
   email: string;
   avatar: string;
+  settings?: {
+    notificationsEnabled: boolean;
+    notificationTime: string;
+  };
 }
 
 interface AuthContextType {
@@ -11,11 +15,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (user: User) => void;
   logout: () => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem('subtrack_user');
     if (savedUser) {
@@ -39,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout, searchQuery, setSearchQuery }}>
       {children}
     </AuthContext.Provider>
   );
