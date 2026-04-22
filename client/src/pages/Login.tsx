@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import api from '../services/api';
 
 export default function Login() {
   const [error, setError] = useState('');
@@ -20,7 +21,7 @@ export default function Login() {
           { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
         );
         
-        const response = await axios.post('/api/auth/google', {
+        const response = await api.post('/api/auth/google', {
           user: userInfo.data,
           youtubeAccessToken: tokenResponse.access_token
         });

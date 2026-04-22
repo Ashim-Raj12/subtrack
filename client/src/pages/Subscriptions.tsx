@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { RefreshCw } from 'lucide-react';
 
 export default function Subscriptions() {
@@ -9,10 +9,8 @@ export default function Subscriptions() {
 
   const fetchSubs = async () => {
     try {
-      const token = localStorage.getItem('subtrack_token');
-      const res = await axios.get('/api/subscriptions', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/api/subscriptions');
+      setSubs(res.data);
       setSubs(res.data);
     } catch (err) {
       console.error(err);
@@ -28,11 +26,8 @@ export default function Subscriptions() {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      const token = localStorage.getItem('subtrack_token');
       const youtubeAccessToken = localStorage.getItem('youtube_access_token');
-      await axios.post('/api/subscriptions/sync', { accessToken: youtubeAccessToken }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/api/subscriptions/sync', { accessToken: youtubeAccessToken });
       await fetchSubs(); // refresh after sync
     } catch (err) {
       console.error('Failed to sync', err);

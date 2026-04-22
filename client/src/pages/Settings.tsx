@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function Settings() {
   const { user, login } = useAuth();
@@ -21,13 +21,9 @@ export default function Settings() {
     try {
       setIsSaving(true);
       setMessage({ type: '', text: '' });
-      const token = localStorage.getItem('subtrack_token');
-      
-      const response = await axios.put('/api/auth/settings', {
+      const response = await api.put('/api/auth/settings', {
         notificationsEnabled,
         notificationTime
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       // Update global user state

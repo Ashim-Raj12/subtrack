@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Play, CheckCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
@@ -12,10 +12,8 @@ export default function Dashboard() {
 
   const fetchVideos = async () => {
     try {
-      const token = localStorage.getItem('subtrack_token');
-      const res = await axios.get('/api/videos/dashboard', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/api/videos/dashboard');
+      setVideos(res.data);
       setVideos(res.data);
     } catch (err) {
       console.error('Error fetching videos', err);
@@ -39,9 +37,8 @@ export default function Dashboard() {
         return;
       }
       
-      await axios.post('/api/subscriptions/sync', 
-        { accessToken: ytToken },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.post('/api/subscriptions/sync', 
+        { accessToken: ytToken }
       );
       
       alert('Sync started! Wait a few moments for the background process to finish fetching new videos, then refresh.');
